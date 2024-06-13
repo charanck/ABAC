@@ -16,3 +16,9 @@ Attribute based access control determine the access of the user based on the att
 ### Policy language
 
     In this project the policies are expressed in a high-level declarative language called Rego, it is built for expressing policies over complex hierarchical data structure.
+
+## Further analysis required for?
+
+1. Database schema
+2. How to store the attributes for resource, user and environment
+3. How generate rego policies dynamically
