@@ -2,7 +2,6 @@
 
 Attribute based access control determine the access of the user based on the attributes of the **user, resource and the environment**
 
-
 ## Types of attributes
 
 * User attributes - Eg: user's role, user's age, user's department etc...
@@ -19,6 +18,6 @@ Attribute based access control determine the access of the user based on the att
 
 ## Further analysis required for?
 
-1. Database schema
-2. How to store the attributes for resource, user and environment
-3. How generate rego policies dynamically
+1. [X] Database schema
+2. [ ] How to store the attributes for resource, user and environment
+3. [ ] How generate rego policies dynamically
