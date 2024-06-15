@@ -12,14 +12,15 @@
 
 ## Policy
 
-| Field       | Type   | Constraint  | Description                  |
-| ----------- | ------ | ----------- | ---------------------------- |
-| Id          | string | primary key |                              |
-| Name        | string | required    | Name of the policy           |
-| Policy      | string | required    | Rego policy in string format |
-| Description | string |             | Details about the policy     |
-| Updated     | date   |             | Last updated time            |
-| Deleted     | date   |             | Deleted on time              |
+| Field       | Type   | Constraint  | Description                                                               |
+| ----------- | ------ | ----------- | ------------------------------------------------------------------------- |
+| Id          | string | primary key |                                                                           |
+| Name        | string | required    | Name of the policy                                                        |
+| Action      | string | required    | Type of action this policy if for(ALL, READ, WRITE, UPDATE, LIST, DELETE) |
+| Policy      | string | required    | Rego policy in string format                                              |
+| Description | string |             | Details about the policy                                                  |
+| Updated     | date   |             | Last updated time                                                         |
+| Deleted     | date   |             | Deleted on time                                                           |
 
 ## **Policy_input**
 
@@ -29,6 +30,7 @@
 | Policy_id | string | foreign key, required         | Parent policy of this input      |
 | Name      | string | foreign key, required, unique | Name of the policy               |
 | Type      | string | required                      | Type of the value for this input |
+| Requried  | bool   | requried                      | If the input is optional        |
 
 ## **User**
 
@@ -59,14 +61,18 @@
 
 ## Attribute
 
-| Field   | Type   | Constraint       | Description                       |
-| ------- | ------ | ---------------- | --------------------------------- |
-| id      | string | primary key      |                                   |
-| Name    | string | required, Unique | Name of the attribute             |
-| Value   | string | required         | base64 enconded data of the value |
-| type    | string | required         | data type of the attribute        |
-| Updated | date   |                  | Last updated time                 |
-| Deleted | date   |                  | Deleted on time                   |
+| Field         | Type   | Constraint       | Description                |
+| ------------- | ------ | ---------------- | -------------------------- |
+| id            | string | primary key      |                            |
+| Name          | string | required, Unique | Name of the attribute      |
+| String_value  | string |                  | Value if type is string    |
+| Integer_value | int    |                  | Value if type is integer   |
+| Float_value   | float  |                  | Value if type is float     |
+| Bool_value    | bool   |                  | Value if type is bool      |
+| Date_value    | date   |                  | Value if type is date      |
+| Type          | string | required         | data type of the attribute |
+| Updated       | date   |                  | Last updated time          |
+| Deleted       | date   |                  | Deleted on time            |
 
 ## Role_Attribute_mapping
 
