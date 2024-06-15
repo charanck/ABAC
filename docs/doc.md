@@ -4,6 +4,8 @@ main -> is the main and base branch and the development branch with latest chang
 
 feature/{FEATURE_NAME} -> is for developing a new feature based of main branch
 
+bugfix/{BUG_NAME} -> is for fixing a bug
+
 # Changelog and version
 
 * Semantic versioning will be used
