@@ -11,3 +11,9 @@ bugfix/{BUG_NAME} -> is for fixing a bug
 * Semantic versioning will be used
 * Changes for all the version must be maintained in the changelog.md and must be updated before each PR merge
 * Version.md will contain the lastest version of the application
+
+# Pull request checklist
+
+* [ ] Use Meaningful branch name and PR title
+* [ ] Update unit test
+* [ ] Update changelog and version.md
