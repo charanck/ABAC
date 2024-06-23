@@ -1,0 +1,13 @@
+syntax = "proto3";
+package abac;
+option go_package = ".;abac";
+
+service Test {
+    rpc Test(Void) returns (TestResponse) {};
+}
+
+message TestResponse {
+    string value = 1;
+}
+
+message Void {}
