@@ -1,0 +1,13 @@
+syntax = "proto3";
+package abac;
+option go_package = ".;abac";
+
+service Health {
+    rpc Health(Void) returns (HealthResponse) {};
+}
+
+message HealthResponse {
+    string message = 1;
+}
+
+message Void {}

@@ -17,3 +17,20 @@ bugfix/{BUG_NAME} -> is for fixing a bug
 * [ ] Use Meaningful branch name and PR title
 * [ ] Update unit test
 * [ ] Update changelog and version.md
+
+# Proto and grpc generation
+
+Define the rpc service in the protobuf/abac.proto file and dont make changes to the files in the generated folder and commit
+
+## Pre requestics to run the grpc code generation:
+
+protoc compiler -> install it using the below commands
+
+* go install google.golang.org/protobuf/cmd/protoc-gen-go
+* go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+Use the below command to generate the grpc code from the proto definition
+
+```
+ protoc --go_out=./protobuf/generated --go-grpc_out=./protobuf/generated  ./protobuf/abac.proto
+```
