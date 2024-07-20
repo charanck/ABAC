@@ -3,12 +3,12 @@ package model
 import "time"
 
 type Resource struct {
-	Id          string
-	Name        string
-	OwnerId     string
-	PolicyId    string
-	Description string
-	Updated     time.Time
-	Deleted     time.Time
-	Created     time.Time
+	Id          string    `db:"id"`
+	Name        string    `db:"name"`
+	OwnerId     string    `db:"owner_id"`
+	PolicyId    string    `db:"policy_id"`
+	Description string    `db:"description"`
+	Updated     time.Time `db:"updated"`
+	Deleted     time.Time `db:"deleted"`
+	Created     time.Time `db:"created"`
 }
