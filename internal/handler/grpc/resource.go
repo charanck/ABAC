@@ -2,9 +2,11 @@ package grpchandler
 
 import (
 	"context"
+	"errors"
 
 	"github.com/charanck/ABAC/internal/handler/grpc/adapter"
 	"github.com/charanck/ABAC/internal/service"
+	"github.com/charanck/ABAC/internal/util"
 	abac "github.com/charanck/ABAC/protobuf/generated"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,9 +24,13 @@ func NewResource(resourceService service.Resource) Resource {
 }
 
 func (r *Resource) CreateResource(ctx context.Context, request *abac.CreateResourceRequest) (*abac.CreateResourceResponse, error) {
-	id, err := r.resourceService.Create(adapter.ResourceGRPCToModel(request))
+	id, err := r.resourceService.Create(adapter.CreateResourceRequestToModel(request))
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Internal server error")
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
+		}
+		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
 	}
 	response := abac.CreateResourceResponse{
 		Id: id,
@@ -33,7 +39,14 @@ func (r *Resource) CreateResource(ctx context.Context, request *abac.CreateResou
 }
 
 func (r *Resource) GetResource(ctx context.Context, request *abac.GetResourceRequest) (*abac.GetResourceResponse, error) {
-	return nil, nil
+	resource, err := r.resourceService.GetById(request.GetId())
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
+		}
+	}
+	return adapter.ModelToGetResourceResponse(resource), nil
 }
 
 func (r *Resource) UpdateResource(ctx context.Context, request *abac.UpdateResourceRequest) (*abac.UpdateResourceResponse, error) {

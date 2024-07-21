@@ -1,11 +1,11 @@
 package service
 
 import (
-	"errors"
 	"time"
 
 	"github.com/charanck/ABAC/internal/model"
 	"github.com/charanck/ABAC/internal/repository"
+	"github.com/charanck/ABAC/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -28,7 +28,7 @@ func (r *Resource) Create(resource model.Resource) (string, error) {
 		return "", err
 	}
 	if existingResource.Id != "" {
-		return "", errors.New("Resource with the name already exists")
+		return "", util.ErrAlreadyExists(nil, "Resource with the name already exists")
 	}
 	// Before creating a resource verify if the policy exists
 	return r.repository.Create(resource)
@@ -36,4 +36,8 @@ func (r *Resource) Create(resource model.Resource) (string, error) {
 
 func (r *Resource) getByName(resourceName string) (model.Resource, error) {
 	return r.repository.GetByName(resourceName)
+}
+
+func (r *Resource) GetById(resourceId string) (model.Resource, error) {
+	return r.repository.GetById(resourceId)
 }
