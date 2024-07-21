@@ -10,6 +10,7 @@ const (
 	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = $1"
 	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = $1"
 	LIST_RESOURCE         = "SELECT * FROM resource"
+	DELETE_RESOURCE_BY_ID = "DELETE FROM resource WHERE id = $1"
 )
 
 type Resource struct {
@@ -57,7 +58,7 @@ func (r *Resource) GetByName(resourceName string) (model.Resource, error) {
 	return resource, nil
 }
 
-func (r *Resource) ListResource() ([]model.Resource, error) {
+func (r *Resource) List() ([]model.Resource, error) {
 	rows, err := r.db.Queryx(LIST_RESOURCE)
 	if err != nil {
 		return nil, err
@@ -72,4 +73,12 @@ func (r *Resource) ListResource() ([]model.Resource, error) {
 		resources = append(resources, currentResource)
 	}
 	return resources, nil
+}
+
+func (r *Resource) DeleteById(resourceId string) (string, error) {
+	_, err := r.db.Exec(DELETE_RESOURCE_BY_ID, resourceId)
+	if err != nil {
+		return "", err
+	}
+	return resourceId, nil
 }

@@ -55,11 +55,19 @@ func (r *Resource) UpdateResource(ctx context.Context, request *abac.UpdateResou
 }
 
 func (r *Resource) DeleteResource(ctx context.Context, request *abac.DeleteResourceRequest) (*abac.DeleteResourceResponse, error) {
-	return nil, nil
+	resourceId, err := r.resourceService.DeleteById(request.Id)
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
+		}
+		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
+	}
+	return &abac.DeleteResourceResponse{Id: resourceId}, nil
 }
 
 func (r *Resource) ListResource(ctx context.Context, request *abac.ListResourceRequest) (*abac.ListResourceResponse, error) {
-	resources, err := r.resourceService.ListResource()
+	resources, err := r.resourceService.List()
 	if err != nil {
 		var apiError util.ApiError
 		if errors.As(err, &apiError) {

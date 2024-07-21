@@ -42,6 +42,10 @@ func (r *Resource) GetById(resourceId string) (model.Resource, error) {
 	return r.repository.GetById(resourceId)
 }
 
-func (r *Resource) ListResource() ([]model.Resource, error) {
-	return r.repository.ListResource()
+func (r *Resource) List() ([]model.Resource, error) {
+	return r.repository.List()
+}
+
+func (r *Resource) DeleteById(resourceId string) (string, error) {
+	return r.repository.DeleteById(resourceId)
 }
