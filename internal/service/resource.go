@@ -41,3 +41,7 @@ func (r *Resource) getByName(resourceName string) (model.Resource, error) {
 func (r *Resource) GetById(resourceId string) (model.Resource, error) {
 	return r.repository.GetById(resourceId)
 }
+
+func (r *Resource) ListResource() ([]model.Resource, error) {
+	return r.repository.ListResource()
+}

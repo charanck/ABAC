@@ -27,3 +27,11 @@ func ModelToGetResourceResponse(resource model.Resource) *abac.GetResourceRespon
 		Deleted:     timestamppb.New(resource.Deleted),
 	}
 }
+
+func ModelToListResourceResponse(resources []model.Resource) *abac.ListResourceResponse {
+	response := abac.ListResourceResponse{}
+	for _, resource := range resources {
+		response.Data = append(response.Data, ModelToGetResourceResponse(resource))
+	}
+	return &response
+}

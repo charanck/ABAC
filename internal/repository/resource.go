@@ -9,6 +9,7 @@ const (
 	CREATE_RESOURCE_QUERY = "INSERT INTO resource (id, name, owner_id, policy_id, description, updated, deleted, created) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = $1"
 	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = $1"
+	LIST_RESOURCE         = "SELECT * FROM resource"
 )
 
 type Resource struct {
@@ -48,7 +49,27 @@ func (r *Resource) GetByName(resourceName string) (model.Resource, error) {
 	}
 	resource := model.Resource{}
 	for rows.Next() {
-		rows.StructScan(&resource)
+		err := rows.StructScan(&resource)
+		if err != nil {
+			return model.Resource{}, err
+		}
 	}
 	return resource, nil
+}
+
+func (r *Resource) ListResource() ([]model.Resource, error) {
+	rows, err := r.db.Queryx(LIST_RESOURCE)
+	if err != nil {
+		return nil, err
+	}
+	resources := []model.Resource{}
+	for rows.Next() {
+		currentResource := model.Resource{}
+		err := rows.StructScan(&currentResource)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, currentResource)
+	}
+	return resources, nil
 }

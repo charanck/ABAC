@@ -45,6 +45,7 @@ func (r *Resource) GetResource(ctx context.Context, request *abac.GetResourceReq
 		if errors.As(err, &apiError) {
 			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
 		}
+		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
 	}
 	return adapter.ModelToGetResourceResponse(resource), nil
 }
@@ -58,5 +59,13 @@ func (r *Resource) DeleteResource(ctx context.Context, request *abac.DeleteResou
 }
 
 func (r *Resource) ListResource(ctx context.Context, request *abac.ListResourceRequest) (*abac.ListResourceResponse, error) {
-	return nil, nil
+	resources, err := r.resourceService.ListResource()
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
+		}
+		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
+	}
+	return adapter.ModelToListResourceResponse(resources), nil
 }
