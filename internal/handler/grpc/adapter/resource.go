@@ -35,3 +35,13 @@ func ModelToListResourceResponse(resources []model.Resource) *abac.ListResourceR
 	}
 	return &response
 }
+
+func UpdateResourceRequestToModel(request *abac.UpdateResourceRequest) model.Resource {
+	return model.Resource{
+		Id:          request.Data.Id,
+		Name:        request.Data.Name,
+		OwnerId:     request.Data.OwnerId,
+		PolicyId:    request.Data.PolicyId,
+		Description: request.Data.Description,
+	}
+}

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var ErrInvalidValue = errors.New("invalid value")
+var ErrInvalidWhereCondition = errors.New("invalid where condition")
 
 type Where struct {
 	Left      *Where
@@ -42,7 +42,7 @@ func (e Equal) operation() string {
 }
 
 type DatabaseTable interface {
-	getTableName() string
+	GetTableName() string
 }
 
 func BuildUpdateQuery(data DatabaseTable, fieldMask []string, where Where) (string, []any, error) {
@@ -50,8 +50,7 @@ func BuildUpdateQuery(data DatabaseTable, fieldMask []string, where Where) (stri
 	for _, field := range fieldMask {
 		fieldMaskMap[strings.ToLower(field)] = true
 	}
-	// Implement check to remove where condition fields in the fieldMaskMap to prevent them from updating
-	query := fmt.Sprintf("UPDATE %s SET ", data.getTableName())
+	query := fmt.Sprintf("UPDATE %s SET", data.GetTableName())
 	queryValues := []any{}
 
 	s := reflect.ValueOf(data).Elem()
@@ -68,33 +67,56 @@ func BuildUpdateQuery(data DatabaseTable, fieldMask []string, where Where) (stri
 			noOfUpdateFields++
 		}
 	}
+	whereCondition, whereQueryValues, err := BuildWhereCondition(where)
+	if err != nil {
+		return "", nil, err
+	}
+	query += fmt.Sprintf(" where %s", whereCondition)
+	queryValues = append(queryValues, whereQueryValues...)
 	return query, queryValues, nil
 }
 
-func BuildWhereCondition(where Where) (string, error) {
+func BuildWhereCondition(where Where) (string, []any, error) {
+	// Refactor where condition to return the query and query values seperately
+	if where.Value == nil && where.Operation == nil {
+		return "", nil, ErrInvalidWhereCondition
+	}
 	if where.Value != nil {
-		return fmt.Sprintf("%v", where.Value), nil
+		return fmt.Sprintf("%v", where.Value), nil, nil
 	}
 	var left, right string
+	var queryValue []any
 	if where.Left != nil {
-		res, err := BuildWhereCondition(*where.Left)
+		res, values, err := BuildWhereCondition(*where.Left)
 		if res == "" {
-			return "", ErrInvalidValue
+			return "", nil, ErrInvalidWhereCondition
 		}
 		if err != nil {
-			return "", nil
+			return "", nil, nil
 		}
+		queryValue = append(queryValue, values...)
 		left = fmt.Sprintf("%v", res)
 	}
 	if where.Right != nil {
-		res, err := BuildWhereCondition(*where.Right)
+		res, values, err := BuildWhereCondition(*where.Right)
 		if res == "" {
-			return "", ErrInvalidValue
+			return "", nil, ErrInvalidWhereCondition
 		}
 		if err != nil {
-			return "", nil
+			return "", nil, nil
 		}
-		right = fmt.Sprintf("%v", res)
+		if isLeaf(where.Right) {
+			queryValue = append(queryValue, res)
+			right = "?"
+		} else {
+			queryValue = append(queryValue, values...)
+			right = fmt.Sprintf("%v", res)
+		}
+
 	}
-	return fmt.Sprintf("(%v %s %v)", left, where.Operation.operation(), right), nil
+	return fmt.Sprintf("(%v %s %v)", left, where.Operation.operation(), right), queryValue, nil
+}
+
+func isLeaf(where *Where) bool {
+	return where.Value != nil
 }

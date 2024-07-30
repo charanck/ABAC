@@ -49,3 +49,10 @@ func (r *Resource) List() ([]model.Resource, error) {
 func (r *Resource) DeleteById(resourceId string) (string, error) {
 	return r.repository.DeleteById(resourceId)
 }
+
+func (r *Resource) UpdateById(resource model.Resource, fieldMask []string) (string, error) {
+	resource.Updated = time.Now()
+	fieldMask = append(fieldMask, "updated")
+	r.repository.Update(resource, fieldMask)
+	return "", nil
+}

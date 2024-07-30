@@ -3,6 +3,7 @@ package grpchandler
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/charanck/ABAC/internal/handler/grpc/adapter"
 	"github.com/charanck/ABAC/internal/service"
@@ -51,6 +52,14 @@ func (r *Resource) GetResource(ctx context.Context, request *abac.GetResourceReq
 }
 
 func (r *Resource) UpdateResource(ctx context.Context, request *abac.UpdateResourceRequest) (*abac.UpdateResourceResponse, error) {
+	if strings.TrimSpace(request.Data.Id) == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "id is required")
+	}
+	if !request.FieldMask.IsValid(&abac.UpdateResourceRequest_Data{}) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid fieldmask")
+	}
+	request.FieldMask.Normalize()
+	r.resourceService.UpdateById(adapter.UpdateResourceRequestToModel(request), request.FieldMask.Paths)
 	return nil, nil
 }
 

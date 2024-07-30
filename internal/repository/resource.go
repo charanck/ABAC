@@ -2,15 +2,16 @@ package repository
 
 import (
 	"github.com/charanck/ABAC/internal/model"
+	querybuilder "github.com/charanck/ABAC/internal/model/query_builder"
 	"github.com/jmoiron/sqlx"
 )
 
 const (
-	CREATE_RESOURCE_QUERY = "INSERT INTO resource (id, name, owner_id, policy_id, description, updated, deleted, created) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
-	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = $1"
-	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = $1"
+	CREATE_RESOURCE_QUERY = "INSERT INTO resource (id, name, owner_id, policy_id, description, updated, deleted, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = ?"
+	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = ?"
 	LIST_RESOURCE         = "SELECT * FROM resource"
-	DELETE_RESOURCE_BY_ID = "DELETE FROM resource WHERE id = $1"
+	DELETE_RESOURCE_BY_ID = "DELETE FROM resource WHERE id = ?"
 )
 
 type Resource struct {
@@ -59,6 +60,14 @@ func (r *Resource) GetByName(resourceName string) (model.Resource, error) {
 }
 
 func (r *Resource) List() ([]model.Resource, error) {
+	// query, queryValues, _ := model.BuildUpdateQuery(&model.Resource{
+	// 	Id:          "adfa",
+	// 	Name:        "charan",
+	// 	OwnerId:     "adfds",
+	// 	PolicyId:    "adfasd",
+	// 	Description: "adfad",
+	// }, []string{"id", "ownerId"}, "sdfs")
+	// fmt.Println(query, queryValues)
 	rows, err := r.db.Queryx(LIST_RESOURCE)
 	if err != nil {
 		return nil, err
@@ -81,4 +90,24 @@ func (r *Resource) DeleteById(resourceId string) (string, error) {
 		return "", err
 	}
 	return resourceId, nil
+}
+
+func (r *Resource) Update(resource model.Resource, fieldMask []string) (string, error) {
+	query, queryValues, err := querybuilder.BuildUpdateQuery(&resource, fieldMask, querybuilder.Where{
+		Left: &querybuilder.Where{
+			Value: "id",
+		},
+		Right: &querybuilder.Where{
+			Value: resource.Id,
+		},
+		Operation: querybuilder.Equal{},
+	})
+	if err != nil {
+		return "", err
+	}
+	_, err = r.db.Exec(query, queryValues...)
+	if err != nil {
+		return "", err
+	}
+	return resource.Id, nil
 }
