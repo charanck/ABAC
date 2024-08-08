@@ -31,7 +31,7 @@ func (r *Resource) CreateResource(ctx context.Context, request *abac.CreateResou
 		if errors.As(err, &apiError) {
 			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
 		}
-		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
+		return nil, status.Errorf(codes.Internal, "internal server error: %v", err)
 	}
 	response := abac.CreateResourceResponse{
 		Id: id,
@@ -53,14 +53,23 @@ func (r *Resource) GetResource(ctx context.Context, request *abac.GetResourceReq
 
 func (r *Resource) UpdateResource(ctx context.Context, request *abac.UpdateResourceRequest) (*abac.UpdateResourceResponse, error) {
 	if strings.TrimSpace(request.Data.Id) == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "id is required")
+		return nil, status.Errorf(codes.InvalidArgument, "resource id is required")
 	}
 	if !request.FieldMask.IsValid(&abac.UpdateResourceRequest_Data{}) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid fieldmask")
 	}
 	request.FieldMask.Normalize()
-	r.resourceService.UpdateById(adapter.UpdateResourceRequestToModel(request), request.FieldMask.Paths)
-	return nil, nil
+	_, err := r.resourceService.UpdateById(adapter.UpdateResourceRequestToModel(request), request.FieldMask.Paths)
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return nil, status.Error(apiError.GRPCErrorCode, apiError.ErrorMessage)
+		}
+		return nil, status.Errorf(codes.Internal, "internal server error: %v", err)
+	}
+	return &abac.UpdateResourceResponse{
+		Id: request.Data.Id,
+	}, nil
 }
 
 func (r *Resource) DeleteResource(ctx context.Context, request *abac.DeleteResourceRequest) (*abac.DeleteResourceResponse, error) {

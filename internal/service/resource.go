@@ -7,6 +7,7 @@ import (
 	"github.com/charanck/ABAC/internal/repository"
 	"github.com/charanck/ABAC/internal/util"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
 )
 
 type Resource struct {
@@ -51,8 +52,18 @@ func (r *Resource) DeleteById(resourceId string) (string, error) {
 }
 
 func (r *Resource) UpdateById(resource model.Resource, fieldMask []string) (string, error) {
+	existingResource, err := r.repository.GetById(resource.Id)
+	if err != nil {
+		return "", err
+	}
+	if existingResource.Id == "" {
+		return "", util.ApiError{
+			HTTPErrorCode: 404,
+			GRPCErrorCode: codes.NotFound,
+			ErrorMessage:  "resource not found",
+		}
+	}
 	resource.Updated = time.Now()
 	fieldMask = append(fieldMask, "updated")
-	r.repository.Update(resource, fieldMask)
-	return "", nil
+	return r.repository.Update(resource, fieldMask)
 }

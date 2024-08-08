@@ -112,7 +112,6 @@ func BuildWhereCondition(where Where) (string, []any, error) {
 			queryValue = append(queryValue, values...)
 			right = fmt.Sprintf("%v", res)
 		}
-
 	}
 	return fmt.Sprintf("(%v %s %v)", left, where.Operation.operation(), right), queryValue, nil
 }
