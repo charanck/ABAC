@@ -1,10 +1,89 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
 package abac;
 option go_package = ".;abac";
 
 service Health {
     rpc Health(Void) returns (HealthResponse) {};
 }
+
+service Resource {
+    rpc CreateResource(CreateResourceRequest) returns (CreateResourceResponse) {};
+    rpc GetResource(GetResourceRequest) returns (GetResourceResponse) {};
+    rpc UpdateResource(UpdateResourceRequest) returns (UpdateResourceResponse) {};
+    rpc DeleteResource(DeleteResourceRequest) returns (DeleteResourceResponse) {};
+    rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {};
+}
+
+message GetResourceRequest {
+    string id = 1;
+}
+
+message GetResourceResponse {
+    string id = 1;
+    string name = 2;
+    string ownerId = 3;
+    string policyId = 4;
+    string description = 5;
+    google.protobuf.Timestamp updated = 6;
+    google.protobuf.Timestamp deleted = 7;
+    google.protobuf.Timestamp created = 8;
+}
+
+message CreateResourceRequest {
+    string name = 1;
+    string ownerId = 2;
+    string policyId = 3;
+    string description = 4;
+}
+
+message CreateResourceResponse {
+    string id = 1;
+}
+
+message UpdateResourceRequest {
+    message Data {
+        string id = 1;
+        string name = 2;
+        string ownerId = 3;
+        string policyId = 4;
+        string description = 5;
+    }
+
+    Data data = 1;
+    google.protobuf.FieldMask fieldMask = 2;
+
+
+}
+
+message UpdateResourceResponse {
+    string id = 1;
+}
+
+message DeleteResourceRequest {
+    string id = 1;
+}
+
+message DeleteResourceResponse {
+    string id = 1;
+}
+
+message ListResourceRequest {
+    PagingMetadata pagingMetadata = 1;
+}
+
+message ListResourceResponse {
+    repeated GetResourceResponse data = 1;
+}
+
+message PagingMetadata {
+    int64 pageNumber = 1;
+    int64 pageSize = 2; 
+}
+
+
 
 message HealthResponse {
     string message = 1;
