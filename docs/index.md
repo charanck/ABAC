@@ -34,3 +34,8 @@ Use the below command to generate the grpc code from the proto definition
 ```
  protoc --go_out=./protobuf/generated --go-grpc_out=./protobuf/generated  ./protobuf/abac.proto
 ```
+
+# Generating http and grpc sever code using script
+
+* Go to the script directory and run `go run script.go`
+* navigate throught the script text interface and generate the required server code
