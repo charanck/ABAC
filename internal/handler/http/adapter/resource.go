@@ -21,3 +21,12 @@ func ModelToList200JSONResponse(resources []model.Resource) api.List200JSONRespo
 	}
 	return response
 }
+
+func CreateRequestObjectToModel(request *api.Resource) model.Resource {
+	return model.Resource{
+		Name:        *request.Name,
+		OwnerId:     *request.OwnerId,
+		PolicyId:    *request.PolicyId,
+		Description: *request.Description,
+	}
+}
