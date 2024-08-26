@@ -72,6 +72,27 @@ func (r *Resource) Create(ctx context.Context, request api.CreateRequestObject) 
 }
 
 func (r *Resource) DeleteById(ctx context.Context, request api.DeleteByIdRequestObject) (api.DeleteByIdResponseObject, error) {
+	_, err := r.resourceService.DeleteById(request.ResourceId)
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return api.DeleteByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    int32(apiError.HTTPErrorCode),
+					Message: apiError.Error(),
+				},
+				StatusCode: apiError.HTTPErrorCode,
+			}, nil
+		} else {
+			return api.DeleteByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    500,
+					Message: "internal server error",
+				},
+				StatusCode: 500,
+			}, nil
+		}
+	}
 	return api.DeleteById200Response{}, nil
 }
 
