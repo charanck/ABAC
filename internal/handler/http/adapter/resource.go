@@ -30,3 +30,16 @@ func CreateRequestObjectToModel(request *api.Resource) model.Resource {
 		Description: *request.Description,
 	}
 }
+
+func ModelToGetByIdResponseObject(resource model.Resource) api.GetById200JSONResponse {
+	return api.GetById200JSONResponse{
+		Id:          &resource.Id,
+		Created:     &resource.Created,
+		Updated:     &resource.Updated,
+		Deleted:     &resource.Deleted,
+		Description: &resource.Description,
+		Name:        &resource.Name,
+		OwnerId:     &resource.OwnerId,
+		PolicyId:    &resource.PolicyId,
+	}
+}

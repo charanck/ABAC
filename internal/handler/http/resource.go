@@ -97,7 +97,28 @@ func (r *Resource) DeleteById(ctx context.Context, request api.DeleteByIdRequest
 }
 
 func (r *Resource) GetById(ctx context.Context, request api.GetByIdRequestObject) (api.GetByIdResponseObject, error) {
-	return api.GetById200JSONResponse{}, nil
+	resource, err := r.resourceService.GetById(request.ResourceId)
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return api.GetByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    int32(apiError.HTTPErrorCode),
+					Message: apiError.Error(),
+				},
+				StatusCode: apiError.HTTPErrorCode,
+			}, nil
+		} else {
+			return api.GetByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    500,
+					Message: "internal server error",
+				},
+				StatusCode: 500,
+			}, nil
+		}
+	}
+	return adapter.ModelToGetByIdResponseObject(resource), nil
 }
 
 func (r *Resource) UpdateById(ctx context.Context, request api.UpdateByIdRequestObject) (api.UpdateByIdResponseObject, error) {
