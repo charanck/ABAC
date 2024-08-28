@@ -8,15 +8,16 @@ import (
 func ModelToList200JSONResponse(resources []model.Resource) api.List200JSONResponse {
 	var response []api.Resource
 	for _, resource := range resources {
+		tempResource := resource
 		response = append(response, api.Resource{
-			Id:          &resource.Id,
-			Name:        &resource.Name,
-			OwnerId:     &resource.OwnerId,
-			PolicyId:    &resource.PolicyId,
-			Updated:     &resource.Updated,
-			Created:     &resource.Created,
-			Deleted:     &resource.Deleted,
-			Description: &resource.Description,
+			Id:          &tempResource.Id,
+			Name:        &tempResource.Name,
+			OwnerId:     &tempResource.OwnerId,
+			PolicyId:    &tempResource.PolicyId,
+			Updated:     &tempResource.Updated,
+			Created:     &tempResource.Created,
+			Deleted:     &tempResource.Deleted,
+			Description: &tempResource.Description,
 		})
 	}
 	return response
