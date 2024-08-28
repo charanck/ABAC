@@ -43,3 +43,13 @@ func ModelToGetByIdResponseObject(resource model.Resource) api.GetById200JSONRes
 		PolicyId:    &resource.PolicyId,
 	}
 }
+
+func UpdateByIdRequestObjectToModel(request api.UpdateByIdRequestObject) model.Resource {
+	return model.Resource{
+		Id:          request.ResourceId,
+		Name:        *request.Body.Data.Name,
+		OwnerId:     *request.Body.Data.OwnerId,
+		PolicyId:    *request.Body.Data.PolicyId,
+		Description: *request.Body.Data.Description,
+	}
+}

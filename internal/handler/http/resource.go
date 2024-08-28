@@ -122,5 +122,26 @@ func (r *Resource) GetById(ctx context.Context, request api.GetByIdRequestObject
 }
 
 func (r *Resource) UpdateById(ctx context.Context, request api.UpdateByIdRequestObject) (api.UpdateByIdResponseObject, error) {
+	_, err := r.resourceService.UpdateById(adapter.UpdateByIdRequestObjectToModel(request), *request.Body.FieldMask.Paths)
+	if err != nil {
+		var apiError util.ApiError
+		if errors.As(err, &apiError) {
+			return api.UpdateByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    int32(apiError.HTTPErrorCode),
+					Message: apiError.Error(),
+				},
+				StatusCode: apiError.HTTPErrorCode,
+			}, nil
+		} else {
+			return api.UpdateByIddefaultJSONResponse{
+				Body: api.Error{
+					Code:    500,
+					Message: "internal server error",
+				},
+				StatusCode: 500,
+			}, nil
+		}
+	}
 	return api.UpdateById200Response{}, nil
 }
