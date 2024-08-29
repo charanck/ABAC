@@ -10,7 +10,7 @@ const (
 	CREATE_RESOURCE_QUERY = "INSERT INTO resource (id, name, owner_id, policy_id, description, updated, deleted, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = ?"
 	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = ?"
-	LIST_RESOURCE         = "SELECT * FROM resource"
+	LIST_RESOURCE         = "SELECT * FROM resource LIMIT ? OFFSET ?"
 	DELETE_RESOURCE_BY_ID = "DELETE FROM resource WHERE id = ?"
 )
 
@@ -59,16 +59,8 @@ func (r *Resource) GetByName(resourceName string) (model.Resource, error) {
 	return resource, nil
 }
 
-func (r *Resource) List() ([]model.Resource, error) {
-	// query, queryValues, _ := model.BuildUpdateQuery(&model.Resource{
-	// 	Id:          "adfa",
-	// 	Name:        "charan",
-	// 	OwnerId:     "adfds",
-	// 	PolicyId:    "adfasd",
-	// 	Description: "adfad",
-	// }, []string{"id", "ownerId"}, "sdfs")
-	// fmt.Println(query, queryValues)
-	rows, err := r.db.Queryx(LIST_RESOURCE)
+func (r *Resource) List(limit, offset int) ([]model.Resource, error) {
+	rows, err := r.db.Queryx(LIST_RESOURCE, limit, offset)
 	if err != nil {
 		return nil, err
 	}

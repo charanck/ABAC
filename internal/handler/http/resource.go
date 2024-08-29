@@ -21,7 +21,15 @@ func NewResource(resourceService *service.Resource) Resource {
 }
 
 func (r *Resource) List(ctx context.Context, request api.ListRequestObject) (api.ListResponseObject, error) {
-	resources, err := r.resourceService.List()
+	pageNumber, pageSize := 0, 0
+	if request.Params.PageNumber != nil {
+		pageNumber = *request.Params.PageNumber
+	}
+	if request.Params.PageSize != nil {
+		pageSize = *request.Params.PageSize
+	}
+
+	resources, err := r.resourceService.List(pageNumber, pageSize)
 	if err != nil {
 		var apiError util.ApiError
 		if errors.As(err, &apiError) {

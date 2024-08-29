@@ -43,8 +43,16 @@ func (r *Resource) GetById(resourceId string) (model.Resource, error) {
 	return r.repository.GetById(resourceId)
 }
 
-func (r *Resource) List() ([]model.Resource, error) {
-	return r.repository.List()
+func (r *Resource) List(pageNumber, pageSize int) ([]model.Resource, error) {
+	offset := 0
+	if pageNumber > 1 {
+		offset = (pageNumber - 1) * pageSize
+	}
+	limit := 5
+	if pageSize > 0 {
+		limit = pageSize
+	}
+	return r.repository.List(limit, offset)
 }
 
 func (r *Resource) DeleteById(resourceId string) (string, error) {
