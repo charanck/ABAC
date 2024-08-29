@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/oapi-codegen/runtime"
@@ -20,36 +21,64 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// Pet defines model for Pet.
-type Pet struct {
-	Id   int64   `json:"id"`
-	Name string  `json:"name"`
-	Tag  *string `json:"tag,omitempty"`
+// FieldMask defines model for FieldMask.
+type FieldMask struct {
+	Paths *[]string `json:"paths,omitempty"`
 }
 
-// Pets defines model for Pets.
-type Pets = []Pet
-
-// ListPetsParams defines parameters for ListPets.
-type ListPetsParams struct {
-	// Limit How many items to return at one time (max 100)
-	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
+// Resource defines model for Resource.
+type Resource struct {
+	Created     *time.Time `json:"created,omitempty"`
+	Deleted     *time.Time `json:"deleted,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Id          *string    `json:"id,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	OwnerId     *string    `json:"ownerId,omitempty"`
+	PolicyId    *string    `json:"policyId,omitempty"`
+	Updated     *time.Time `json:"updated,omitempty"`
 }
 
-// CreatePetsJSONRequestBody defines body for CreatePets for application/json ContentType.
-type CreatePetsJSONRequestBody = Pet
+// Resources defines model for Resources.
+type Resources = []Resource
+
+// ListParams defines parameters for List.
+type ListParams struct {
+	// PageNumber page number of the list request
+	PageNumber *int `form:"pageNumber,omitempty" json:"pageNumber,omitempty"`
+
+	// PageSize limit of number of results fetched from the list request
+	PageSize *int `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+}
+
+// UpdateByIdJSONBody defines parameters for UpdateById.
+type UpdateByIdJSONBody struct {
+	Data      *Resource  `json:"data,omitempty"`
+	FieldMask *FieldMask `json:"fieldMask,omitempty"`
+}
+
+// CreateJSONRequestBody defines body for Create for application/json ContentType.
+type CreateJSONRequestBody = Resource
+
+// UpdateByIdJSONRequestBody defines body for UpdateById for application/json ContentType.
+type UpdateByIdJSONRequestBody UpdateByIdJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// List all pets
-	// (GET /pets)
-	ListPets(ctx echo.Context, params ListPetsParams) error
-	// Create a pet
-	// (POST /pets)
-	CreatePets(ctx echo.Context) error
-	// Info for a specific pet
-	// (GET /pets/{petId})
-	ShowPetById(ctx echo.Context, petId string) error
+	// List all resources
+	// (GET /resources)
+	List(ctx echo.Context, params ListParams) error
+	// Create a resource
+	// (POST /resources)
+	Create(ctx echo.Context) error
+	// To delete a resource by id
+	// (DELETE /resources/{resourceId})
+	DeleteById(ctx echo.Context, resourceId string) error
+	// fetch resource by its id
+	// (GET /resources/{resourceId})
+	GetById(ctx echo.Context, resourceId string) error
+	// To update a resource by id
+	// (PUT /resources/{resourceId})
+	UpdateById(ctx echo.Context, resourceId string) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -57,46 +86,85 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// ListPets converts echo context to params.
-func (w *ServerInterfaceWrapper) ListPets(ctx echo.Context) error {
+// List converts echo context to params.
+func (w *ServerInterfaceWrapper) List(ctx echo.Context) error {
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params ListPetsParams
-	// ------------- Optional query parameter "limit" -------------
+	var params ListParams
+	// ------------- Optional query parameter "pageNumber" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	err = runtime.BindQueryParameter("form", true, false, "pageNumber", ctx.QueryParams(), &params.PageNumber)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter pageNumber: %s", err))
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", ctx.QueryParams(), &params.PageSize)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter pageSize: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ListPets(ctx, params)
+	err = w.Handler.List(ctx, params)
 	return err
 }
 
-// CreatePets converts echo context to params.
-func (w *ServerInterfaceWrapper) CreatePets(ctx echo.Context) error {
+// Create converts echo context to params.
+func (w *ServerInterfaceWrapper) Create(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.CreatePets(ctx)
+	err = w.Handler.Create(ctx)
 	return err
 }
 
-// ShowPetById converts echo context to params.
-func (w *ServerInterfaceWrapper) ShowPetById(ctx echo.Context) error {
+// DeleteById converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteById(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "petId" -------------
-	var petId string
+	// ------------- Path parameter "resourceId" -------------
+	var resourceId string
 
-	err = runtime.BindStyledParameterWithOptions("simple", "petId", ctx.Param("petId"), &petId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "resourceId", ctx.Param("resourceId"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter petId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter resourceId: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.ShowPetById(ctx, petId)
+	err = w.Handler.DeleteById(ctx, resourceId)
+	return err
+}
+
+// GetById converts echo context to params.
+func (w *ServerInterfaceWrapper) GetById(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "resourceId" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resourceId", ctx.Param("resourceId"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter resourceId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetById(ctx, resourceId)
+	return err
+}
+
+// UpdateById converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateById(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "resourceId" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resourceId", ctx.Param("resourceId"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter resourceId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.UpdateById(ctx, resourceId)
 	return err
 }
 
@@ -128,100 +196,151 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/pets", wrapper.ListPets)
-	router.POST(baseURL+"/pets", wrapper.CreatePets)
-	router.GET(baseURL+"/pets/:petId", wrapper.ShowPetById)
+	router.GET(baseURL+"/resources", wrapper.List)
+	router.POST(baseURL+"/resources", wrapper.Create)
+	router.DELETE(baseURL+"/resources/:resourceId", wrapper.DeleteById)
+	router.GET(baseURL+"/resources/:resourceId", wrapper.GetById)
+	router.PUT(baseURL+"/resources/:resourceId", wrapper.UpdateById)
 
 }
 
-type ListPetsRequestObject struct {
-	Params ListPetsParams
+type ListRequestObject struct {
+	Params ListParams
 }
 
-type ListPetsResponseObject interface {
-	VisitListPetsResponse(w http.ResponseWriter) error
+type ListResponseObject interface {
+	VisitListResponse(w http.ResponseWriter) error
 }
 
-type ListPets200ResponseHeaders struct {
-	XNext string
-}
+type List200JSONResponse Resources
 
-type ListPets200JSONResponse struct {
-	Body    Pets
-	Headers ListPets200ResponseHeaders
-}
-
-func (response ListPets200JSONResponse) VisitListPetsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("x-next", fmt.Sprint(response.Headers.XNext))
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ListPetsdefaultJSONResponse struct {
-	Body       Error
-	StatusCode int
-}
-
-func (response ListPetsdefaultJSONResponse) VisitListPetsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type CreatePetsRequestObject struct {
-	Body *CreatePetsJSONRequestBody
-}
-
-type CreatePetsResponseObject interface {
-	VisitCreatePetsResponse(w http.ResponseWriter) error
-}
-
-type CreatePets201Response struct {
-}
-
-func (response CreatePets201Response) VisitCreatePetsResponse(w http.ResponseWriter) error {
-	w.WriteHeader(201)
-	return nil
-}
-
-type CreatePetsdefaultJSONResponse struct {
-	Body       Error
-	StatusCode int
-}
-
-func (response CreatePetsdefaultJSONResponse) VisitCreatePetsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type ShowPetByIdRequestObject struct {
-	PetId string `json:"petId"`
-}
-
-type ShowPetByIdResponseObject interface {
-	VisitShowPetByIdResponse(w http.ResponseWriter) error
-}
-
-type ShowPetById200JSONResponse Pet
-
-func (response ShowPetById200JSONResponse) VisitShowPetByIdResponse(w http.ResponseWriter) error {
+func (response List200JSONResponse) VisitListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ShowPetByIddefaultJSONResponse struct {
+type ListdefaultJSONResponse struct {
 	Body       Error
 	StatusCode int
 }
 
-func (response ShowPetByIddefaultJSONResponse) VisitShowPetByIdResponse(w http.ResponseWriter) error {
+func (response ListdefaultJSONResponse) VisitListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CreateRequestObject struct {
+	Body *CreateJSONRequestBody
+}
+
+type CreateResponseObject interface {
+	VisitCreateResponse(w http.ResponseWriter) error
+}
+
+type Create201Response struct {
+}
+
+func (response Create201Response) VisitCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(201)
+	return nil
+}
+
+type CreatedefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response CreatedefaultJSONResponse) VisitCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type DeleteByIdRequestObject struct {
+	ResourceId string `json:"resourceId"`
+}
+
+type DeleteByIdResponseObject interface {
+	VisitDeleteByIdResponse(w http.ResponseWriter) error
+}
+
+type DeleteById200Response struct {
+}
+
+func (response DeleteById200Response) VisitDeleteByIdResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type DeleteByIddefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response DeleteByIddefaultJSONResponse) VisitDeleteByIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type GetByIdRequestObject struct {
+	ResourceId string `json:"resourceId"`
+}
+
+type GetByIdResponseObject interface {
+	VisitGetByIdResponse(w http.ResponseWriter) error
+}
+
+type GetById200JSONResponse Resource
+
+func (response GetById200JSONResponse) VisitGetByIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetByIddefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response GetByIddefaultJSONResponse) VisitGetByIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type UpdateByIdRequestObject struct {
+	ResourceId string `json:"resourceId"`
+	Body       *UpdateByIdJSONRequestBody
+}
+
+type UpdateByIdResponseObject interface {
+	VisitUpdateByIdResponse(w http.ResponseWriter) error
+}
+
+type UpdateById200Response struct {
+}
+
+func (response UpdateById200Response) VisitUpdateByIdResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type UpdateByIddefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response UpdateByIddefaultJSONResponse) VisitUpdateByIdResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -230,15 +349,21 @@ func (response ShowPetByIddefaultJSONResponse) VisitShowPetByIdResponse(w http.R
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// List all pets
-	// (GET /pets)
-	ListPets(ctx context.Context, request ListPetsRequestObject) (ListPetsResponseObject, error)
-	// Create a pet
-	// (POST /pets)
-	CreatePets(ctx context.Context, request CreatePetsRequestObject) (CreatePetsResponseObject, error)
-	// Info for a specific pet
-	// (GET /pets/{petId})
-	ShowPetById(ctx context.Context, request ShowPetByIdRequestObject) (ShowPetByIdResponseObject, error)
+	// List all resources
+	// (GET /resources)
+	List(ctx context.Context, request ListRequestObject) (ListResponseObject, error)
+	// Create a resource
+	// (POST /resources)
+	Create(ctx context.Context, request CreateRequestObject) (CreateResponseObject, error)
+	// To delete a resource by id
+	// (DELETE /resources/{resourceId})
+	DeleteById(ctx context.Context, request DeleteByIdRequestObject) (DeleteByIdResponseObject, error)
+	// fetch resource by its id
+	// (GET /resources/{resourceId})
+	GetById(ctx context.Context, request GetByIdRequestObject) (GetByIdResponseObject, error)
+	// To update a resource by id
+	// (PUT /resources/{resourceId})
+	UpdateById(ctx context.Context, request UpdateByIdRequestObject) (UpdateByIdResponseObject, error)
 }
 
 type StrictHandlerFunc = strictecho.StrictEchoHandlerFunc
@@ -253,79 +378,135 @@ type strictHandler struct {
 	middlewares []StrictMiddlewareFunc
 }
 
-// ListPets operation middleware
-func (sh *strictHandler) ListPets(ctx echo.Context, params ListPetsParams) error {
-	var request ListPetsRequestObject
+// List operation middleware
+func (sh *strictHandler) List(ctx echo.Context, params ListParams) error {
+	var request ListRequestObject
 
 	request.Params = params
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListPets(ctx.Request().Context(), request.(ListPetsRequestObject))
+		return sh.ssi.List(ctx.Request().Context(), request.(ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ListPets")
+		handler = middleware(handler, "List")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ListPetsResponseObject); ok {
-		return validResponse.VisitListPetsResponse(ctx.Response())
+	} else if validResponse, ok := response.(ListResponseObject); ok {
+		return validResponse.VisitListResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// CreatePets operation middleware
-func (sh *strictHandler) CreatePets(ctx echo.Context) error {
-	var request CreatePetsRequestObject
+// Create operation middleware
+func (sh *strictHandler) Create(ctx echo.Context) error {
+	var request CreateRequestObject
 
-	var body CreatePetsJSONRequestBody
+	var body CreateJSONRequestBody
 	if err := ctx.Bind(&body); err != nil {
 		return err
 	}
 	request.Body = &body
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CreatePets(ctx.Request().Context(), request.(CreatePetsRequestObject))
+		return sh.ssi.Create(ctx.Request().Context(), request.(CreateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CreatePets")
+		handler = middleware(handler, "Create")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(CreatePetsResponseObject); ok {
-		return validResponse.VisitCreatePetsResponse(ctx.Response())
+	} else if validResponse, ok := response.(CreateResponseObject); ok {
+		return validResponse.VisitCreateResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
 	return nil
 }
 
-// ShowPetById operation middleware
-func (sh *strictHandler) ShowPetById(ctx echo.Context, petId string) error {
-	var request ShowPetByIdRequestObject
+// DeleteById operation middleware
+func (sh *strictHandler) DeleteById(ctx echo.Context, resourceId string) error {
+	var request DeleteByIdRequestObject
 
-	request.PetId = petId
+	request.ResourceId = resourceId
 
 	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ShowPetById(ctx.Request().Context(), request.(ShowPetByIdRequestObject))
+		return sh.ssi.DeleteById(ctx.Request().Context(), request.(DeleteByIdRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ShowPetById")
+		handler = middleware(handler, "DeleteById")
 	}
 
 	response, err := handler(ctx, request)
 
 	if err != nil {
 		return err
-	} else if validResponse, ok := response.(ShowPetByIdResponseObject); ok {
-		return validResponse.VisitShowPetByIdResponse(ctx.Response())
+	} else if validResponse, ok := response.(DeleteByIdResponseObject); ok {
+		return validResponse.VisitDeleteByIdResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// GetById operation middleware
+func (sh *strictHandler) GetById(ctx echo.Context, resourceId string) error {
+	var request GetByIdRequestObject
+
+	request.ResourceId = resourceId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetById(ctx.Request().Context(), request.(GetByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetById")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(GetByIdResponseObject); ok {
+		return validResponse.VisitGetByIdResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// UpdateById operation middleware
+func (sh *strictHandler) UpdateById(ctx echo.Context, resourceId string) error {
+	var request UpdateByIdRequestObject
+
+	request.ResourceId = resourceId
+
+	var body UpdateByIdJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateById(ctx.Request().Context(), request.(UpdateByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateById")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(UpdateByIdResponseObject); ok {
+		return validResponse.VisitUpdateByIdResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}

@@ -40,14 +40,44 @@ func (r *Resource) getByName(resourceName string) (model.Resource, error) {
 }
 
 func (r *Resource) GetById(resourceId string) (model.Resource, error) {
-	return r.repository.GetById(resourceId)
+	resource, err := r.repository.GetById(resourceId)
+	if err != nil {
+		return model.Resource{}, err
+	}
+	if resource.Id == "" {
+		return model.Resource{}, util.ApiError{
+			HTTPErrorCode: 404,
+			GRPCErrorCode: codes.NotFound,
+			ErrorMessage:  "resource not found",
+		}
+	}
+	return resource, nil
 }
 
-func (r *Resource) List() ([]model.Resource, error) {
-	return r.repository.List()
+func (r *Resource) List(pageNumber, pageSize int) ([]model.Resource, error) {
+	offset := 0
+	if pageNumber > 1 {
+		offset = (pageNumber - 1) * pageSize
+	}
+	limit := 5
+	if pageSize > 0 {
+		limit = pageSize
+	}
+	return r.repository.List(limit, offset)
 }
 
 func (r *Resource) DeleteById(resourceId string) (string, error) {
+	existingResource, err := r.repository.GetById(resourceId)
+	if err != nil {
+		return "", err
+	}
+	if existingResource.Id == "" {
+		return "", util.ApiError{
+			HTTPErrorCode: 404,
+			GRPCErrorCode: codes.NotFound,
+			ErrorMessage:  "resource not found",
+		}
+	}
 	return r.repository.DeleteById(resourceId)
 }
 

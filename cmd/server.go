@@ -11,6 +11,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	grpchandler "github.com/charanck/ABAC/internal/handler/grpc"
+	httphandler "github.com/charanck/ABAC/internal/handler/http"
+	api "github.com/charanck/ABAC/internal/handler/http/generated"
 	"github.com/charanck/ABAC/internal/repository"
 	"github.com/charanck/ABAC/internal/service"
 	abac "github.com/charanck/ABAC/protobuf/generated"
@@ -37,11 +39,14 @@ func StartServer() {
 	// Setup dependencies
 	resourceRepository := repository.NewResource(db)
 	resourceService := service.NewResource(&resourceRepository)
-	resourceHandler := grpchandler.NewResource(resourceService)
+	resourceGRPCHandler := grpchandler.NewResource(resourceService)
+	resourceHTTPHandler := httphandler.NewResource(&resourceService)
 
 	// Start http server
 	go func() {
 		e := echo.New()
+		var strictHandler api.ServerInterface = api.NewStrictHandler(&resourceHTTPHandler, nil)
+		api.RegisterHandlers(e, strictHandler)
 		e.GET("/", func(c echo.Context) error {
 			return c.JSON(http.StatusOK, abac.HealthResponse{
 				Message: "OK",
@@ -63,7 +68,7 @@ func StartServer() {
 
 	// Register the grpc handlers
 	abac.RegisterHealthServer(grpcServer, grpchandler.HealthServer{})
-	abac.RegisterResourceServer(grpcServer, &resourceHandler)
+	abac.RegisterResourceServer(grpcServer, &resourceGRPCHandler)
 
 	grpcServer.Serve(lis)
 
