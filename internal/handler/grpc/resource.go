@@ -85,7 +85,12 @@ func (r *Resource) DeleteResource(ctx context.Context, request *abac.DeleteResou
 }
 
 func (r *Resource) ListResource(ctx context.Context, request *abac.ListResourceRequest) (*abac.ListResourceResponse, error) {
-	resources, err := r.resourceService.List(int(request.PagingMetadata.PageNumber), int(request.PagingMetadata.PageSize))
+	pageNumber, pageSize := 1, 10
+	if request != nil && request.PagingMetadata != nil {
+		pageNumber = int(request.PagingMetadata.GetPageNumber())
+		pageSize = int(request.PagingMetadata.GetPageSize())
+	}
+	resources, err := r.resourceService.List(pageNumber, pageSize)
 	if err != nil {
 		var apiError util.ApiError
 		if errors.As(err, &apiError) {
