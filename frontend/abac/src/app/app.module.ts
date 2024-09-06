@@ -6,19 +6,29 @@ import { AppComponent } from './app.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
+import { ResourceService } from './resources/resource.service';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
+import {MatMenuModule} from '@angular/material/menu';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ResourcesComponent
-  ],
+  declarations: [AppComponent, ResourcesComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatIconModule
+    MatIconModule,
+    HttpClientModule,
+    CommonModule,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatMenuModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [ResourceService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
