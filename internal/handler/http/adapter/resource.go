@@ -20,7 +20,10 @@ func ModelToList200JSONResponse(resources []model.Resource) api.List200JSONRespo
 			Description: &tempResource.Description,
 		})
 	}
-	return response
+	return api.List200JSONResponse{
+		Data:           &response,
+		PagingMetadata: &api.PagingMetadata{},
+	}
 }
 
 func CreateRequestObjectToModel(request *api.Resource) model.Resource {

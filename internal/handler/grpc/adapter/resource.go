@@ -17,14 +17,17 @@ func CreateResourceRequestToModel(request *abac.CreateResourceRequest) model.Res
 
 func ModelToGetResourceResponse(resource model.Resource) *abac.GetResourceResponse {
 	return &abac.GetResourceResponse{
-		Id:          resource.Id,
-		OwnerId:     resource.OwnerId,
-		PolicyId:    resource.PolicyId,
-		Name:        resource.Name,
-		Description: resource.Description,
-		Updated:     timestamppb.New(resource.Updated),
-		Created:     timestamppb.New(resource.Created),
-		Deleted:     timestamppb.New(resource.Deleted),
+		Data: &abac.GetResourceDataResponse{
+			Id:          resource.Id,
+			OwnerId:     resource.OwnerId,
+			PolicyId:    resource.PolicyId,
+			Name:        resource.Name,
+			Description: resource.Description,
+			Updated:     timestamppb.New(resource.Updated),
+			Created:     timestamppb.New(resource.Created),
+			Deleted:     timestamppb.New(resource.Deleted),
+		},
+		PagingMetadata: &abac.PagingMetadata{},
 	}
 }
 
