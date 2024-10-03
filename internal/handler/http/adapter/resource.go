@@ -5,7 +5,7 @@ import (
 	"github.com/charanck/ABAC/internal/model"
 )
 
-func ModelToList200JSONResponse(resources []model.Resource) api.List200JSONResponse {
+func ModelToList200JSONResponse(resources []model.Resource, total int64) api.List200JSONResponse {
 	var response []api.Resource
 	for _, resource := range resources {
 		tempResource := resource
@@ -21,8 +21,10 @@ func ModelToList200JSONResponse(resources []model.Resource) api.List200JSONRespo
 		})
 	}
 	return api.List200JSONResponse{
-		Data:           &response,
-		PagingMetadata: &api.PagingMetadata{},
+		Data: &response,
+		PagingMetadata: &api.PagingMetadata{
+			Total: &total,
+		},
 	}
 }
 

@@ -34,7 +34,6 @@ message GetResourceDataResponse {
 
 message GetResourceResponse {
     GetResourceDataResponse data = 1;
-    PagingMetadata pagingMetadata = 2;
 }
 
 message CreateResourceRequest {
@@ -81,6 +80,7 @@ message ListResourceRequest {
 
 message ListResourceResponse {
     repeated GetResourceResponse data = 1;
+    PagingMetadata pagingMetadata = 2;
 }
 
 message PagingMetadata {

@@ -90,7 +90,7 @@ func (r *Resource) ListResource(ctx context.Context, request *abac.ListResourceR
 		pageNumber = int(request.PagingMetadata.GetPageNumber())
 		pageSize = int(request.PagingMetadata.GetPageSize())
 	}
-	resources, err := r.resourceService.List(pageNumber, pageSize)
+	resources, total, err := r.resourceService.List(pageNumber, pageSize)
 	if err != nil {
 		var apiError util.ApiError
 		if errors.As(err, &apiError) {
@@ -98,5 +98,5 @@ func (r *Resource) ListResource(ctx context.Context, request *abac.ListResourceR
 		}
 		return nil, status.Errorf(codes.Internal, "Internal server error: %v", err)
 	}
-	return adapter.ModelToListResourceResponse(resources), nil
+	return adapter.ModelToListResourceResponse(resources, total), nil
 }

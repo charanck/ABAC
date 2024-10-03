@@ -27,15 +27,15 @@ func ModelToGetResourceResponse(resource model.Resource) *abac.GetResourceRespon
 			Created:     timestamppb.New(resource.Created),
 			Deleted:     timestamppb.New(resource.Deleted),
 		},
-		PagingMetadata: &abac.PagingMetadata{},
 	}
 }
 
-func ModelToListResourceResponse(resources []model.Resource) *abac.ListResourceResponse {
+func ModelToListResourceResponse(resources []model.Resource, total int64) *abac.ListResourceResponse {
 	response := abac.ListResourceResponse{}
 	for _, resource := range resources {
 		response.Data = append(response.Data, ModelToGetResourceResponse(resource))
 	}
+	response.PagingMetadata.Total = total
 	return &response
 }
 

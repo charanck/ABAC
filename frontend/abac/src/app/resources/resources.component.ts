@@ -9,10 +9,10 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
   styleUrls: ['./resources.component.scss'],
 })
 export class ResourcesComponent {
-  protected length = 100;
-  protected pageSize = 5;
+  protected length = 0;
+  protected pageSize = 10;
   protected pageIndex = 0;
-  protected pageSizeOptions = [5, 10, 25];
+  protected pageSizeOptions = [10, 15, 20];
   protected resources: WritableSignal<MatTableDataSource<Resource>> = signal(
     new MatTableDataSource<Resource>()
   );
@@ -42,8 +42,9 @@ export class ResourcesComponent {
   fetchResources() {
     this.resourceService
       .listResources(this.pageIndex + 1, this.pageSize)
-      .subscribe((resources) => {
-        this.resources.set(new MatTableDataSource<Resource>(resources));
+      .subscribe((response) => {
+        this.length = response.pagingMetadata.total;
+        this.resources.set(new MatTableDataSource<Resource>(response.data));
       });
   }
 }

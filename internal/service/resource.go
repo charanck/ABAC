@@ -54,7 +54,7 @@ func (r *Resource) GetById(resourceId string) (model.Resource, error) {
 	return resource, nil
 }
 
-func (r *Resource) List(pageNumber, pageSize int) ([]model.Resource, error) {
+func (r *Resource) List(pageNumber, pageSize int) ([]model.Resource, int64, error) {
 	offset := 0
 	if pageNumber > 1 {
 		offset = (pageNumber - 1) * pageSize

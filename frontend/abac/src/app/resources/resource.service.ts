@@ -9,22 +9,36 @@ const BASE_URL = 'http://localhost:3000';
 export class ResourceService {
   constructor(private http: HttpClient) {}
 
-  listResources(pageNumber: number, pageSize: number): Observable<Resource[]> {
+  listResources(
+    pageNumber: number,
+    pageSize: number
+  ): Observable<{
+    data: Resource[];
+    pagingMetadata: PagingMetadata;
+  }> {
     return this.http
-      .get<Resource[]>(`${BASE_URL}/resources`, {
+      .get<{
+        data: Resource[];
+        pagingMetadata: PagingMetadata;
+      }>(`${BASE_URL}/resources`, {
         params: {
           pageNumber: pageNumber,
           pageSize: pageSize,
         },
       })
       .pipe(
-        map((resources) => {
-          for (let i = 0; i < resources.length; i++) {
-            resources[i].deleted = new Date(resources[i].deleted);
-            resources[i].created = new Date(resources[i].created);
-            resources[i].updated = new Date(resources[i].updated);
+        map((response) => {
+          for (let i = 0; i < response.data.length; i++) {
+            response.data[i].deleted = new Date(response.data[i].deleted);
+            response.data[i].created = new Date(response.data[i].created);
+            response.data[i].updated = new Date(response.data[i].updated);
           }
-          return resources;
+          return {
+            data: response.data,
+            pagingMetadata: {
+              total: response.pagingMetadata.total,
+            },
+          };
         })
       );
   }
@@ -39,4 +53,8 @@ export interface Resource {
   updated: Date;
   created: Date;
   deleted: Date;
+}
+
+export interface PagingMetadata {
+  total: number;
 }

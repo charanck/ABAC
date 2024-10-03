@@ -29,7 +29,7 @@ func (r *Resource) List(ctx context.Context, request api.ListRequestObject) (api
 		pageSize = *request.Params.PageSize
 	}
 
-	resources, err := r.resourceService.List(pageNumber, pageSize)
+	resources, total, err := r.resourceService.List(pageNumber, pageSize)
 	if err != nil {
 		var apiError util.ApiError
 		if errors.As(err, &apiError) {
@@ -50,7 +50,7 @@ func (r *Resource) List(ctx context.Context, request api.ListRequestObject) (api
 			}, nil
 		}
 	}
-	return adapter.ModelToList200JSONResponse(resources), nil
+	return adapter.ModelToList200JSONResponse(resources, total), nil
 }
 
 func (r *Resource) Create(ctx context.Context, request api.CreateRequestObject) (api.CreateResponseObject, error) {
