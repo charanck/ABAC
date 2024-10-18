@@ -1,7 +1,8 @@
-import { Component, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
 import { Resource, ResourceService } from './resource.service';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
+import {Router } from '@angular/router';
 
 @Component({
   selector: 'app-resources',
@@ -26,7 +27,7 @@ export class ResourcesComponent {
   ];
 
 
-  constructor(private resourceService: ResourceService) {}
+  constructor(private resourceService: ResourceService, private router:Router) {}
 
   ngOnInit() {
     this.fetchResources();
@@ -46,5 +47,9 @@ export class ResourcesComponent {
         this.length = response.pagingMetadata.total;
         this.resources.set(new MatTableDataSource<Resource>(response.data));
       });
+  }
+
+  view(row: Resource){
+    this.router.navigateByUrl(`/resources/${row.id}`);
   }
 }

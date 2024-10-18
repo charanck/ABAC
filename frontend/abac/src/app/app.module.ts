@@ -13,9 +13,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import {MatMenuModule} from '@angular/material/menu';
+import { CreateEditResourceComponent } from './resources/create-edit-resource/create-edit-resource.component';
 
 @NgModule({
-  declarations: [AppComponent, ResourcesComponent],
+  declarations: [AppComponent, ResourcesComponent, CreateEditResourceComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
