@@ -1,8 +1,18 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { Resource, ResourceService } from './resource.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import {Router } from '@angular/router';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { CreateEditResourceDialogComponent } from './create-edit-resource-dialog/create-edit-resource-dialog.component';
 
 @Component({
   selector: 'app-resources',
@@ -10,6 +20,10 @@ import {Router } from '@angular/router';
   styleUrls: ['./resources.component.scss'],
 })
 export class ResourcesComponent {
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly resourceService = inject(ResourceService); 
+
   protected length = 0;
   protected pageSize = 10;
   protected pageIndex = 0;
@@ -26,8 +40,6 @@ export class ResourcesComponent {
     'menu',
   ];
 
-
-  constructor(private resourceService: ResourceService, private router:Router) {}
 
   ngOnInit() {
     this.fetchResources();
@@ -49,7 +61,23 @@ export class ResourcesComponent {
       });
   }
 
-  view(row: Resource){
-    this.router.navigateByUrl(`/resources/${row.id}`);
+  viewEdit(row: Resource){
+    const dialogRef = this.dialog.open(CreateEditResourceDialogComponent, {
+      data: row,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
+  createResource(){
+    const dialogRef = this.dialog.open(CreateEditResourceDialogComponent, {
+      data: null,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 }

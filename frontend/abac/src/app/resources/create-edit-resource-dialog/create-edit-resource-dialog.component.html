@@ -1,0 +1,27 @@
+<form [formGroup]="form">
+    <h1>{{type === FormType.create ? "Create Resource" : "Update Resource"}}</h1>
+    <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="User" [formControlName]="'name'">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Description</mat-label>
+        <input matInput placeholder="User" [formControlName]="'description'">
+    </mat-form-field>
+    <mat-form-field>
+        <!-- TO DO: convert them to select field after requried api is completed -->
+        <mat-label>Owner</mat-label>
+        <input matInput placeholder="User" [formControlName]="'ownerId'">
+    </mat-form-field>
+    <mat-form-field>
+        <!-- TO DO: convert them to select field after requried api is completed -->
+        <mat-label>Policy</mat-label>
+        <input matInput placeholder="User" [formControlName]="'policyId'">
+    </mat-form-field>
+    <br>
+    <div class="flex justify-end">
+        <button class="m-2" color="success" mat-raised-button (click)="FormType.create ? create() : update()">{{ type === FormType.create ? "Create" : "Save" }}</button>
+        <button class="m-2" mat-stroked-button (click)="close()">Cancel</button>
+    </div>
+
+</form>
