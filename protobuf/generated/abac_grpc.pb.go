@@ -333,3 +333,269 @@ var Resource_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "protobuf/abac.proto",
 }
+
+// AttributeClient is the client API for Attribute service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AttributeClient interface {
+	CreateAttribute(ctx context.Context, in *CreateAttributeRequest, opts ...grpc.CallOption) (*CreateAttributeResponse, error)
+	BatchCreateAttribute(ctx context.Context, in *BatchCreateAttributeRequest, opts ...grpc.CallOption) (*BatchCreateAttributeResponse, error)
+	UpdateAttribute(ctx context.Context, in *UpdateAttributeRequest, opts ...grpc.CallOption) (*UpdateAttributeResponse, error)
+	ListAttribute(ctx context.Context, in *ListAttributeRequest, opts ...grpc.CallOption) (*ListAttributeResponse, error)
+	GetAttribute(ctx context.Context, in *GetAttributeRequest, opts ...grpc.CallOption) (*GetAttributeResponse, error)
+	DeleteAttribute(ctx context.Context, in *DeleteAttributeRequest, opts ...grpc.CallOption) (*Void, error)
+}
+
+type attributeClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAttributeClient(cc grpc.ClientConnInterface) AttributeClient {
+	return &attributeClient{cc}
+}
+
+func (c *attributeClient) CreateAttribute(ctx context.Context, in *CreateAttributeRequest, opts ...grpc.CallOption) (*CreateAttributeResponse, error) {
+	out := new(CreateAttributeResponse)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/CreateAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *attributeClient) BatchCreateAttribute(ctx context.Context, in *BatchCreateAttributeRequest, opts ...grpc.CallOption) (*BatchCreateAttributeResponse, error) {
+	out := new(BatchCreateAttributeResponse)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/BatchCreateAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *attributeClient) UpdateAttribute(ctx context.Context, in *UpdateAttributeRequest, opts ...grpc.CallOption) (*UpdateAttributeResponse, error) {
+	out := new(UpdateAttributeResponse)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/UpdateAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *attributeClient) ListAttribute(ctx context.Context, in *ListAttributeRequest, opts ...grpc.CallOption) (*ListAttributeResponse, error) {
+	out := new(ListAttributeResponse)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/ListAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *attributeClient) GetAttribute(ctx context.Context, in *GetAttributeRequest, opts ...grpc.CallOption) (*GetAttributeResponse, error) {
+	out := new(GetAttributeResponse)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/GetAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *attributeClient) DeleteAttribute(ctx context.Context, in *DeleteAttributeRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/abac.Attribute/DeleteAttribute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AttributeServer is the server API for Attribute service.
+// All implementations must embed UnimplementedAttributeServer
+// for forward compatibility
+type AttributeServer interface {
+	CreateAttribute(context.Context, *CreateAttributeRequest) (*CreateAttributeResponse, error)
+	BatchCreateAttribute(context.Context, *BatchCreateAttributeRequest) (*BatchCreateAttributeResponse, error)
+	UpdateAttribute(context.Context, *UpdateAttributeRequest) (*UpdateAttributeResponse, error)
+	ListAttribute(context.Context, *ListAttributeRequest) (*ListAttributeResponse, error)
+	GetAttribute(context.Context, *GetAttributeRequest) (*GetAttributeResponse, error)
+	DeleteAttribute(context.Context, *DeleteAttributeRequest) (*Void, error)
+	mustEmbedUnimplementedAttributeServer()
+}
+
+// UnimplementedAttributeServer must be embedded to have forward compatible implementations.
+type UnimplementedAttributeServer struct {
+}
+
+func (UnimplementedAttributeServer) CreateAttribute(context.Context, *CreateAttributeRequest) (*CreateAttributeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAttribute not implemented")
+}
+func (UnimplementedAttributeServer) BatchCreateAttribute(context.Context, *BatchCreateAttributeRequest) (*BatchCreateAttributeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchCreateAttribute not implemented")
+}
+func (UnimplementedAttributeServer) UpdateAttribute(context.Context, *UpdateAttributeRequest) (*UpdateAttributeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAttribute not implemented")
+}
+func (UnimplementedAttributeServer) ListAttribute(context.Context, *ListAttributeRequest) (*ListAttributeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAttribute not implemented")
+}
+func (UnimplementedAttributeServer) GetAttribute(context.Context, *GetAttributeRequest) (*GetAttributeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAttribute not implemented")
+}
+func (UnimplementedAttributeServer) DeleteAttribute(context.Context, *DeleteAttributeRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAttribute not implemented")
+}
+func (UnimplementedAttributeServer) mustEmbedUnimplementedAttributeServer() {}
+
+// UnsafeAttributeServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AttributeServer will
+// result in compilation errors.
+type UnsafeAttributeServer interface {
+	mustEmbedUnimplementedAttributeServer()
+}
+
+func RegisterAttributeServer(s grpc.ServiceRegistrar, srv AttributeServer) {
+	s.RegisterService(&Attribute_ServiceDesc, srv)
+}
+
+func _Attribute_CreateAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).CreateAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/CreateAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).CreateAttribute(ctx, req.(*CreateAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Attribute_BatchCreateAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchCreateAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).BatchCreateAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/BatchCreateAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).BatchCreateAttribute(ctx, req.(*BatchCreateAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Attribute_UpdateAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).UpdateAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/UpdateAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).UpdateAttribute(ctx, req.(*UpdateAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Attribute_ListAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).ListAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/ListAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).ListAttribute(ctx, req.(*ListAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Attribute_GetAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).GetAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/GetAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).GetAttribute(ctx, req.(*GetAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Attribute_DeleteAttribute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAttributeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttributeServer).DeleteAttribute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/abac.Attribute/DeleteAttribute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttributeServer).DeleteAttribute(ctx, req.(*DeleteAttributeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Attribute_ServiceDesc is the grpc.ServiceDesc for Attribute service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Attribute_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "abac.Attribute",
+	HandlerType: (*AttributeServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateAttribute",
+			Handler:    _Attribute_CreateAttribute_Handler,
+		},
+		{
+			MethodName: "BatchCreateAttribute",
+			Handler:    _Attribute_BatchCreateAttribute_Handler,
+		},
+		{
+			MethodName: "UpdateAttribute",
+			Handler:    _Attribute_UpdateAttribute_Handler,
+		},
+		{
+			MethodName: "ListAttribute",
+			Handler:    _Attribute_ListAttribute_Handler,
+		},
+		{
+			MethodName: "GetAttribute",
+			Handler:    _Attribute_GetAttribute_Handler,
+		},
+		{
+			MethodName: "DeleteAttribute",
+			Handler:    _Attribute_DeleteAttribute_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "protobuf/abac.proto",
+}

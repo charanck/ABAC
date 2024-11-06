@@ -17,6 +17,85 @@ service Resource {
     rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {};
 }
 
+service Attribute {
+    rpc CreateAttribute(CreateAttributeRequest) returns (CreateAttributeResponse){};
+    rpc BatchCreateAttribute(BatchCreateAttributeRequest) returns (BatchCreateAttributeResponse) {};
+    rpc UpdateAttribute(UpdateAttributeRequest) returns (UpdateAttributeResponse){};
+    rpc ListAttribute(ListAttributeRequest) returns (ListAttributeResponse){};
+    rpc GetAttribute(GetAttributeRequest) returns (GetAttributeResponse){};
+    rpc DeleteAttribute(DeleteAttributeRequest) returns (Void){};
+}
+
+message DeleteAttributeRequest {
+    string id = 1;
+}
+
+message GetAttributeRequest {
+    string id = 1;
+}
+
+message GetAttributeResponse {
+    string id = 1;
+    string name = 2;
+    string string_value = 3;
+    int64 integer_value = 4;
+    float float_value = 5;
+    bool bool_value = 6;
+    google.protobuf.Timestamp date_value = 7;
+    string type = 8;
+    google.protobuf.Timestamp updated = 9;
+    google.protobuf.Timestamp deleted = 10;
+    google.protobuf.Timestamp created = 11;
+}
+
+message ListAttributeRequest {
+    PagingMetadata pagingMetadata = 1;
+}
+
+message ListAttributeResponse {
+    repeated GetAttributeResponse attributes = 1;
+}
+
+message UpdateAttributeRequest {
+    message Data {
+        string id = 1;
+        string string_value = 2;
+        int64 integer_value = 3;
+        float float_value = 4;
+        bool bool_value = 5;
+        google.protobuf.Timestamp date_value = 6;
+        string type = 7;
+    }
+    Data data = 1;
+    google.protobuf.FieldMask fieldMask = 2;
+}
+
+message UpdateAttributeResponse {
+    string id = 1;
+}
+
+message CreateAttributeRequest {
+    string name = 1;
+    string string_value = 2;
+    int64 integer_value = 3;
+    float float_value = 4;
+    bool bool_value = 5;
+    google.protobuf.Timestamp date_value = 6;
+    string type = 7;
+}
+
+message CreateAttributeResponse {
+    string id = 1;
+}
+
+message BatchCreateAttributeRequest {
+    repeated CreateAttributeRequest attributes = 1;
+}
+
+message BatchCreateAttributeResponse {
+    repeated string attribute_ids = 1;
+}
+
 message GetResourceRequest {
     string id = 1;
 }
