@@ -17,6 +17,7 @@ import (
 	"github.com/charanck/ABAC/internal/service"
 	abac "github.com/charanck/ABAC/protobuf/generated"
 	"github.com/labstack/echo/v4"
+	middleware "github.com/labstack/echo/v4/middleware"
 	"google.golang.org/grpc"
 )
 
@@ -45,6 +46,9 @@ func StartServer() {
 	// Start http server
 	go func() {
 		e := echo.New()
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins: []string{"*"},
+		}))
 		var strictHandler api.ServerInterface = api.NewStrictHandler(&resourceHTTPHandler, nil)
 		api.RegisterHandlers(e, strictHandler)
 		e.GET("/", func(c echo.Context) error {

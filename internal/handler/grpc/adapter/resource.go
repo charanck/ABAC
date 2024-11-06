@@ -17,22 +17,25 @@ func CreateResourceRequestToModel(request *abac.CreateResourceRequest) model.Res
 
 func ModelToGetResourceResponse(resource model.Resource) *abac.GetResourceResponse {
 	return &abac.GetResourceResponse{
-		Id:          resource.Id,
-		OwnerId:     resource.OwnerId,
-		PolicyId:    resource.PolicyId,
-		Name:        resource.Name,
-		Description: resource.Description,
-		Updated:     timestamppb.New(resource.Updated),
-		Created:     timestamppb.New(resource.Created),
-		Deleted:     timestamppb.New(resource.Deleted),
+		Data: &abac.GetResourceDataResponse{
+			Id:          resource.Id,
+			OwnerId:     resource.OwnerId,
+			PolicyId:    resource.PolicyId,
+			Name:        resource.Name,
+			Description: resource.Description,
+			Updated:     timestamppb.New(resource.Updated),
+			Created:     timestamppb.New(resource.Created),
+			Deleted:     timestamppb.New(resource.Deleted),
+		},
 	}
 }
 
-func ModelToListResourceResponse(resources []model.Resource) *abac.ListResourceResponse {
+func ModelToListResourceResponse(resources []model.Resource, total int64) *abac.ListResourceResponse {
 	response := abac.ListResourceResponse{}
 	for _, resource := range resources {
 		response.Data = append(response.Data, ModelToGetResourceResponse(resource))
 	}
+	response.PagingMetadata.Total = total
 	return &response
 }
 

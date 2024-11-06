@@ -11,6 +11,7 @@ const (
 	GET_RESOURCE_BY_ID    = "SELECT * FROM resource WHERE id = ?"
 	GET_RESOURCE_BY_NAME  = "SELECT * FROM resource WHERE name = ?"
 	LIST_RESOURCE         = "SELECT * FROM resource LIMIT ? OFFSET ?"
+	TOTAL_RESULT          = "SELECT COUNT(*) FROM resource"
 	DELETE_RESOURCE_BY_ID = "DELETE FROM resource WHERE id = ?"
 )
 
@@ -59,21 +60,32 @@ func (r *Resource) GetByName(resourceName string) (model.Resource, error) {
 	return resource, nil
 }
 
-func (r *Resource) List(limit, offset int) ([]model.Resource, error) {
+func (r *Resource) List(limit, offset int) ([]model.Resource, int64, error) {
 	rows, err := r.db.Queryx(LIST_RESOURCE, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	resources := []model.Resource{}
 	for rows.Next() {
 		currentResource := model.Resource{}
 		err := rows.StructScan(&currentResource)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		resources = append(resources, currentResource)
 	}
-	return resources, nil
+	total, err := r.db.Queryx(TOTAL_RESULT)
+	if err != nil {
+		return nil, 0, err
+	}
+	var count int64
+	for total.Next() {
+		err := total.Scan(&count)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	return resources, count, nil
 }
 
 func (r *Resource) DeleteById(resourceId string) (string, error) {

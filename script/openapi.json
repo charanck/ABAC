@@ -43,7 +43,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Resources"
+                  "type": "object",
+                  "properties": {
+                    "pagingMetadata": {
+                      "$ref": "#/components/schemas/PagingMetadata"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Resources"
+                    }
+                  }
                 }
               }
             }
@@ -287,6 +295,26 @@
               "type": "string",
               "example": "ownerId"
             }
+          }
+        }
+      },
+      "PagingMetadata": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 100,
+            "format": "int64"
+          },
+          "pageSize": {
+            "type": "integer",
+            "example": 10,
+            "format": "int64"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "example": 1,
+            "format": "int64"
           }
         }
       }

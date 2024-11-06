@@ -26,6 +26,13 @@ type FieldMask struct {
 	Paths *[]string `json:"paths,omitempty"`
 }
 
+// PagingMetadata defines model for PagingMetadata.
+type PagingMetadata struct {
+	PageNumber *int64 `json:"pageNumber,omitempty"`
+	PageSize   *int64 `json:"pageSize,omitempty"`
+	Total      *int64 `json:"total,omitempty"`
+}
+
 // Resource defines model for Resource.
 type Resource struct {
 	Created     *time.Time `json:"created,omitempty"`
@@ -212,7 +219,10 @@ type ListResponseObject interface {
 	VisitListResponse(w http.ResponseWriter) error
 }
 
-type List200JSONResponse Resources
+type List200JSONResponse struct {
+	Data           *Resources      `json:"data,omitempty"`
+	PagingMetadata *PagingMetadata `json:"pagingMetadata,omitempty"`
+}
 
 func (response List200JSONResponse) VisitListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
