@@ -2,8 +2,6 @@ package model
 
 import "time"
 
-const tableName string = "resource"
-
 type Resource struct {
 	Id          string    `db:"id"`
 	Name        string    `db:"name"`
@@ -16,5 +14,5 @@ type Resource struct {
 }
 
 func (r Resource) GetTableName() string {
-	return tableName
+	return "resource"
 }
