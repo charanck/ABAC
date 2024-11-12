@@ -25,3 +25,12 @@ func ErrAlreadyExists(err error, message string) ApiError {
 		Err:           err,
 	}
 }
+
+func ErrBadRequestExists(err error, message string) ApiError {
+	return ApiError{
+		GRPCErrorCode: codes.InvalidArgument,
+		HTTPErrorCode: 403,
+		ErrorMessage:  message,
+		Err:           err,
+	}
+}
