@@ -43,6 +43,10 @@ func StartServer() {
 	resourceGRPCHandler := grpchandler.NewResource(resourceService)
 	resourceHTTPHandler := httphandler.NewResource(&resourceService)
 
+	attributeRepository := repository.NewAttribute(db)
+	attributeService := service.NewAttribute(&attributeRepository)
+	attributeGRPCHandler := grpchandler.NewAttribute(attributeService)
+
 	// Start http server
 	go func() {
 		e := echo.New()
@@ -73,6 +77,7 @@ func StartServer() {
 	// Register the grpc handlers
 	abac.RegisterHealthServer(grpcServer, grpchandler.HealthServer{})
 	abac.RegisterResourceServer(grpcServer, &resourceGRPCHandler)
+	abac.RegisterAttributeServer(grpcServer, &attributeGRPCHandler)
 
 	grpcServer.Serve(lis)
 
